@@ -1,0 +1,608 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2575.7">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+  </style>
+</head>
+<body>
+<p class="p1">&lt;!doctype html&gt;</p>
+<p class="p1">&lt;html lang="en"&gt;</p>
+<p class="p1">&lt;head&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;meta charset="utf-8" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;meta name="viewport" content="width=device-width,initial-scale=1" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;title&gt;Water Tracker&lt;/title&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;style&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>:root{</p>
+<p class="p1"><span class="Apple-converted-space">      </span>--w: 920px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>--bar-w: 760px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>--blue: #3a7bd5;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>--water: #6ad3fe;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>--text: #111;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>--muted: #4a4a4a;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>--line: #111;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>--bg: #fff;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>--sep: #474747;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>body{</p>
+<p class="p1"><span class="Apple-converted-space">      </span>font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>background: var(--bg);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>color: var(--text);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>display: grid;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>place-items: start center;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>padding: 18px;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.app{</p>
+<p class="p1"><span class="Apple-converted-space">      </span>width: min(var(--w), 100%);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border-radius: 16px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>padding: 12px 10px 18px;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.bar-row{</p>
+<p class="p1"><span class="Apple-converted-space">      </span>display: grid;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>grid-template-columns: 90px 1fr 90px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>align-items: center;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>gap: 10px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>margin-top: 4px;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.time-label{</p>
+<p class="p1"><span class="Apple-converted-space">      </span>font-size: 14px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>color: var(--text);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>text-align: center;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>user-select: none;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.bar-wrap{</p>
+<p class="p1"><span class="Apple-converted-space">      </span>position: relative;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>height: 22px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>width: min(var(--bar-w), 100%);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>margin: 0 auto;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border: 2px solid var(--line);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border-radius: 8px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>overflow: hidden;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>background: transparent;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.bar-fill{</p>
+<p class="p1"><span class="Apple-converted-space">      </span>position: absolute;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>left: 0;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>top: 0;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>bottom: 0;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>width: 0%;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>background: var(--blue);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.now-line{</p>
+<p class="p1"><span class="Apple-converted-space">      </span>position: absolute;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>top: -8px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>bottom: -8px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>width: 2px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>background: var(--line);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>left: 0%;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>transform: translateX(-1px);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.header-text{</p>
+<p class="p1"><span class="Apple-converted-space">      </span>text-align: center;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>font-weight: 700;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>margin: 6px 0 10px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>user-select: none;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.cups{</p>
+<p class="p1"><span class="Apple-converted-space">      </span>display: grid;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>grid-template-columns: repeat(16, 1fr);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>gap: 8px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>margin-top: 10px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>align-items: start;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.cup-col{</p>
+<p class="p1"><span class="Apple-converted-space">      </span>display: grid;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>justify-items: center;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>gap: 6px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>position: relative;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>/* separators after every 3 cups */</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.cup-col.sep::after{</p>
+<p class="p1"><span class="Apple-converted-space">      </span>content:"";</p>
+<p class="p1"><span class="Apple-converted-space">      </span>position:absolute;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>right: -6px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>top: -6px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>bottom: 24px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>width: 2px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>background: var(--sep);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>opacity: 0.9;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.cup{</p>
+<p class="p1"><span class="Apple-converted-space">      </span>width: 45px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>height: 70px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>position: relative;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>cursor: pointer;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>user-select: none;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>/* Cup outline using SVG for consistent rim + bottom */</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.cup svg{</p>
+<p class="p1"><span class="Apple-converted-space">      </span>width: 100%;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>height: 100%;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>display: block;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.water{</p>
+<p class="p1"><span class="Apple-converted-space">      </span>position: absolute;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>left: 7px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>right: 7px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>bottom: 10px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>height: 0%;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>background: var(--water);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border-bottom-left-radius: 18px 22px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border-bottom-right-radius: 18px 22px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border-top-left-radius: 14px 10px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border-top-right-radius: 14px 10px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>filter: saturate(1.05);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>opacity: 0;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>transition: opacity 140ms ease;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>pointer-events: none;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>/* give the water a slight curved surface */</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.water::before{</p>
+<p class="p1"><span class="Apple-converted-space">      </span>content:"";</p>
+<p class="p1"><span class="Apple-converted-space">      </span>position:absolute;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>left: -2px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>right: -2px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>top: -6px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>height: 14px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border-radius: 999px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border: 1px solid rgba(0,0,0,0.45);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>background: rgba(255,255,255,0.08);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.check{</p>
+<p class="p1"><span class="Apple-converted-space">      </span>position: absolute;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>inset: 0;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>display: grid;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>place-items: center;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>font-size: 34px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>font-weight: 800;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>color: #17a34a;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>opacity: 0;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>transform: scale(0.96);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>transition: opacity 120ms ease, transform 120ms ease;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>pointer-events: none;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.cup.reached .water{</p>
+<p class="p1"><span class="Apple-converted-space">      </span>opacity: 1;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>height: 85%;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>/* if checked: show check, hide water */</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.cup.checked .check{</p>
+<p class="p1"><span class="Apple-converted-space">      </span>opacity: 1;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>transform: scale(1);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.cup.checked .water{</p>
+<p class="p1"><span class="Apple-converted-space">      </span>opacity: 0;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.due{</p>
+<p class="p1"><span class="Apple-converted-space">      </span>font-size: 11px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>color: #333;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>user-select: none;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>white-space: nowrap;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.caption{</p>
+<p class="p1"><span class="Apple-converted-space">      </span>margin-top: 10px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>text-align: center;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>color: #444;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.controls{</p>
+<p class="p1"><span class="Apple-converted-space">      </span>display: flex;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>gap: 10px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>justify-content: center;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>align-items: center;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>margin-top: 16px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>flex-wrap: wrap;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>button{</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border: none;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>padding: 8px 14px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border-radius: 999px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>background: #6ad3fe;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>font-weight: 700;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>cursor: pointer;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>button:hover{ background: #bbe9fc; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>button:active{ background: #41b9ea; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>button:disabled{</p>
+<p class="p1"><span class="Apple-converted-space">      </span>opacity: 0.5;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>cursor: not-allowed;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>input{</p>
+<p class="p1"><span class="Apple-converted-space">      </span>width: 90px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>padding: 7px 10px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border-radius: 10px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border: 1px solid #bbb;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>text-align: center;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>font-size: 14px;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.status{</p>
+<p class="p1"><span class="Apple-converted-space">      </span>text-align:center;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>margin-top: 8px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>color: #333;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>font-size: 13px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>user-select: none;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>@media (max-width: 980px){</p>
+<p class="p1"><span class="Apple-converted-space">      </span>.cups{ grid-template-columns: repeat(8, 1fr); row-gap: 14px; }</p>
+<p class="p1"><span class="Apple-converted-space">      </span>.cup-col.sep::after{ display:none; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/style&gt;</p>
+<p class="p1">&lt;/head&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;body&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;div class="app"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="header-text" id="countdown"&gt;Press Start&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="bar-row"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="time-label" id="startLabel"&gt;7:00 AM&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="bar-wrap"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="bar-fill" id="barFill"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="now-line" id="nowLine"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="time-label" id="endLabel"&gt;10:00 PM&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="controls"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;button id="startNowBtn"&gt;Start (now)&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;input id="startInput" value="7:00am" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;button id="setStartBtn"&gt;Set Start Time&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;button id="resetBtn" title="Clears saved session &amp; checks"&gt;Reset&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="status" id="status"&gt;Enter a start time or press Start.&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="cups" id="cups"&gt;&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="caption"&gt;Click cups to check off 8 oz each (click again to undo).&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;script&gt;</p>
+<p class="p1">(() =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">  </span>// ----------------------------</p>
+<p class="p1"><span class="Apple-converted-space">  </span>// Config (matches your Tkinter)</p>
+<p class="p1"><span class="Apple-converted-space">  </span>// ----------------------------</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const START_TIME = { h: 7, m: 0 }; <span class="Apple-converted-space">  </span>// 7:00 AM label default (actual session start is user-set)</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const END_TIME <span class="Apple-converted-space">  </span>= { h: 22, m: 0 };<span class="Apple-converted-space">  </span>// 10:00 PM</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const NUM_CUPS = 16;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const UPDATE_MS = 1000;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>// separator after every N cups (visual)</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const SEPS_ENABLED = true;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const SEPS_EVERY_N = 3;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>// ----------------------------</p>
+<p class="p1"><span class="Apple-converted-space">  </span>// Helpers</p>
+<p class="p1"><span class="Apple-converted-space">  </span>// ----------------------------</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const clamp = (x, lo=0, hi=1) =&gt; Math.max(lo, Math.min(hi, x));</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>function fmtAMPM(date){</p>
+<p class="p1"><span class="Apple-converted-space">    </span>// returns like "7:05 PM" without leading zero hour</p>
+<p class="p1"><span class="Apple-converted-space">    </span>let h = date.getHours();</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const m = date.getMinutes();</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const suffix = h &lt; 12 ? "AM" : "PM";</p>
+<p class="p1"><span class="Apple-converted-space">    </span>let h12 = h % 12;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>if (h12 === 0) h12 = 12;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>return `${h12}:${String(m).padStart(2,"0")} ${suffix}`;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>function fmtAMPMFromHM(h, m){</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const d = new Date();</p>
+<p class="p1"><span class="Apple-converted-space">    </span>d.setHours(h, m, 0, 0);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>return fmtAMPM(d);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>function parseTimeString(s){</p>
+<p class="p1"><span class="Apple-converted-space">    </span>// Accepts: '7:05', '07:05', '7:05am', '7:05 pm', '19:05'</p>
+<p class="p1"><span class="Apple-converted-space">    </span>s = (s ?? "").trim().toLowerCase().replaceAll(" ", "");</p>
+<p class="p1"><span class="Apple-converted-space">    </span>if (!s) return null;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>const am = s.endsWith("am");</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const pm = s.endsWith("pm");</p>
+<p class="p1"><span class="Apple-converted-space">    </span>if (am || pm) s = s.slice(0, -2);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>if (!s.includes(":")) return null;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const [hh, mm] = s.split(":", 2);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>if (!/^\d+$/.test(hh) || !/^\d+$/.test(mm)) return null;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>let h = Number(hh);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const m = Number(mm);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>if (m &lt; 0 || m &gt; 59) return null;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>if (am || pm){</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (h &lt; 1 || h &gt; 12) return null;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (h === 12) h = 0;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (pm) h += 12;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>} else {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (h &lt; 0 || h &gt; 23) return null;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>return { h, m };</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>function todayAt(h, m){</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const now = new Date();</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const d = new Date(now);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>d.setHours(h, m, 0, 0);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>return d;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>function addDays(date, n){</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const d = new Date(date);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>d.setDate(d.getDate() + n);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>return d;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>function msBetween(a, b){ return b.getTime() - a.getTime(); }</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>// ----------------------------</p>
+<p class="p1"><span class="Apple-converted-space">  </span>// State + persistence</p>
+<p class="p1"><span class="Apple-converted-space">  </span>// ----------------------------</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const STORAGE_KEY = "water_tracker_v1";</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const state = {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>started: false,</p>
+<p class="p1"><span class="Apple-converted-space">    </span>sessionStart: null, // Date</p>
+<p class="p1"><span class="Apple-converted-space">    </span>sessionEnd: null, <span class="Apple-converted-space">  </span>// Date</p>
+<p class="p1"><span class="Apple-converted-space">    </span>dueTimes: Array(NUM_CUPS).fill(null), // Date[]</p>
+<p class="p1"><span class="Apple-converted-space">    </span>checked: Array(NUM_CUPS).fill(false),</p>
+<p class="p1"><span class="Apple-converted-space">    </span>reached: Array(NUM_CUPS).fill(false),</p>
+<p class="p1"><span class="Apple-converted-space">  </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>function save(){</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const payload = {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>started: state.started,</p>
+<p class="p1"><span class="Apple-converted-space">      </span>sessionStart: state.sessionStart ? state.sessionStart.toISOString() : null,</p>
+<p class="p1"><span class="Apple-converted-space">      </span>sessionEnd: state.sessionEnd ? state.sessionEnd.toISOString() : null,</p>
+<p class="p1"><span class="Apple-converted-space">      </span>dueTimes: state.dueTimes.map(d =&gt; d ? d.toISOString() : null),</p>
+<p class="p1"><span class="Apple-converted-space">      </span>checked: state.checked</p>
+<p class="p1"><span class="Apple-converted-space">    </span>};</p>
+<p class="p1"><span class="Apple-converted-space">    </span>localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>function load(){</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const raw = localStorage.getItem(STORAGE_KEY);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>if (!raw) return;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>try{</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const p = JSON.parse(raw);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>state.started = !!p.started;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>state.sessionStart = p.sessionStart ? new Date(p.sessionStart) : null;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>state.sessionEnd = p.sessionEnd ? new Date(p.sessionEnd) : null;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>state.dueTimes = Array.isArray(p.dueTimes) ? p.dueTimes.map(x =&gt; x ? new Date(x) : null) : Array(NUM_CUPS).fill(null);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>state.checked = Array.isArray(p.checked) ? p.checked.map(Boolean).slice(0, NUM_CUPS) : Array(NUM_CUPS).fill(false);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>// reached will be recomputed on tick</p>
+<p class="p1"><span class="Apple-converted-space">    </span>} catch {}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>function resetAll(){</p>
+<p class="p1"><span class="Apple-converted-space">    </span>localStorage.removeItem(STORAGE_KEY);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>state.started = false;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>state.sessionStart = null;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>state.sessionEnd = null;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>state.dueTimes = Array(NUM_CUPS).fill(null);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>state.checked = Array(NUM_CUPS).fill(false);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>state.reached = Array(NUM_CUPS).fill(false);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>renderAll();</p>
+<p class="p1"><span class="Apple-converted-space">    </span>setStatus("Enter a start time or press Start.");</p>
+<p class="p1"><span class="Apple-converted-space">    </span>setCountdown("Press Start");</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>// ----------------------------</p>
+<p class="p1"><span class="Apple-converted-space">  </span>// UI build</p>
+<p class="p1"><span class="Apple-converted-space">  </span>// ----------------------------</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const cupsEl = document.getElementById("cups");</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const barFillEl = document.getElementById("barFill");</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const nowLineEl = document.getElementById("nowLine");</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const countdownEl = document.getElementById("countdown");</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const statusEl = document.getElementById("status");</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const startNowBtn = document.getElementById("startNowBtn");</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const setStartBtn = document.getElementById("setStartBtn");</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const resetBtn = document.getElementById("resetBtn");</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const startInput = document.getElementById("startInput");</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>document.getElementById("startLabel").textContent = fmtAMPMFromHM(START_TIME.h, START_TIME.m);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>document.getElementById("endLabel").textContent <span class="Apple-converted-space">  </span>= fmtAMPMFromHM(END_TIME.h, END_TIME.m);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>// Cup SVG template (rim oval + sides + bottom arc)</p>
+<p class="p1"><span class="Apple-converted-space">  </span>function cupSVG(){</p>
+<p class="p1"><span class="Apple-converted-space">    </span>return `</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;svg viewBox="0 0 45 70" aria-hidden="true"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;!-- rim oval --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;ellipse cx="22.5" cy="9" rx="14" ry="6" fill="none" stroke="#111" stroke-width="2"/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;!-- sides --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;path d="M 10 10 C 8 28, 10 45, 14 58" fill="none" stroke="#111" stroke-width="2" stroke-linecap="round"/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;path d="M 35 10 C 37 28, 35 45, 31 58" fill="none" stroke="#111" stroke-width="2" stroke-linecap="round"/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;!-- bottom --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;path d="M 14 58 C 18 66, 27 66, 31 58" fill="none" stroke="#111" stroke-width="2" stroke-linecap="round"/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/svg&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>`;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const cupNodes = [];</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>function buildCups(){</p>
+<p class="p1"><span class="Apple-converted-space">    </span>cupsEl.innerHTML = "";</p>
+<p class="p1"><span class="Apple-converted-space">    </span>cupNodes.length = 0;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>for (let i=0; i&lt;NUM_CUPS; i++){</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const col = document.createElement("div");</p>
+<p class="p1"><span class="Apple-converted-space">      </span>col.className = "cup-col" + (SEPS_ENABLED &amp;&amp; SEPS_EVERY_N&gt;0 &amp;&amp; (i % SEPS_EVERY_N === SEPS_EVERY_N-1) &amp;&amp; i !== NUM_CUPS-1 ? " sep" : "");</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>const cup = document.createElement("div");</p>
+<p class="p1"><span class="Apple-converted-space">      </span>cup.className = "cup";</p>
+<p class="p1"><span class="Apple-converted-space">      </span>cup.innerHTML = `</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="water"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="check"&gt;✓&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>${cupSVG()}</p>
+<p class="p1"><span class="Apple-converted-space">      </span>`;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>const due = document.createElement("div");</p>
+<p class="p1"><span class="Apple-converted-space">      </span>due.className = "due";</p>
+<p class="p1"><span class="Apple-converted-space">      </span>due.textContent = "--:--";</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>cup.addEventListener("click", () =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>state.checked[i] = !state.checked[i];</p>
+<p class="p1"><span class="Apple-converted-space">        </span>save();</p>
+<p class="p1"><span class="Apple-converted-space">        </span>renderCup(i);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>});</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>col.appendChild(cup);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>col.appendChild(due);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>cupsEl.appendChild(col);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>cupNodes.push({ cup, due });</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>function setStatus(text){ statusEl.textContent = text; }</p>
+<p class="p1"><span class="Apple-converted-space">  </span>function setCountdown(text){ countdownEl.textContent = text; }</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>// ----------------------------</p>
+<p class="p1"><span class="Apple-converted-space">  </span>// Session logic (matches your Python)</p>
+<p class="p1"><span class="Apple-converted-space">  </span>// ----------------------------</p>
+<p class="p1"><span class="Apple-converted-space">  </span>function applySessionStart(startDt){</p>
+<p class="p1"><span class="Apple-converted-space">    </span>let endDt = todayAt(END_TIME.h, END_TIME.m);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>if (startDt &gt;= endDt) endDt = addDays(endDt, 1);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>state.sessionStart = startDt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>state.sessionEnd = endDt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>state.started = true;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>const totalMs = msBetween(state.sessionStart, state.sessionEnd);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const step = totalMs / NUM_CUPS;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>for (let i=0; i&lt;NUM_CUPS; i++){</p>
+<p class="p1"><span class="Apple-converted-space">      </span>state.dueTimes[i] = new Date(state.sessionStart.getTime() + step * (i+1));</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>save();</p>
+<p class="p1"><span class="Apple-converted-space">    </span>setStatus(`Started at ${fmtAMPM(state.sessionStart)}`);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>renderAll(); // updates due labels immediately</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>function startNow(){</p>
+<p class="p1"><span class="Apple-converted-space">    </span>applySessionStart(new Date());</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>function startFromEntry(){</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const parsed = parseTimeString(startInput.value);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>if (!parsed){</p>
+<p class="p1"><span class="Apple-converted-space">      </span>setStatus("Invalid time. Try 8:15am, 08:15, or 20:15.");</p>
+<p class="p1"><span class="Apple-converted-space">      </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const now = new Date();</p>
+<p class="p1"><span class="Apple-converted-space">    </span>let startDt = new Date(now);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>startDt.setHours(parsed.h, parsed.m, 0, 0);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>// If typed time is in the future (later today), assume they meant yesterday</p>
+<p class="p1"><span class="Apple-converted-space">    </span>if (startDt &gt; now) startDt = addDays(startDt, -1);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>applySessionStart(startDt);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>// ----------------------------</p>
+<p class="p1"><span class="Apple-converted-space">  </span>// Rendering</p>
+<p class="p1"><span class="Apple-converted-space">  </span>// ----------------------------</p>
+<p class="p1"><span class="Apple-converted-space">  </span>function renderCup(i){</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const node = cupNodes[i];</p>
+<p class="p1"><span class="Apple-converted-space">    </span>if (!node) return;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>const reached = !!state.reached[i];</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const checked = !!state.checked[i];</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>node.cup.classList.toggle("reached", reached);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>node.cup.classList.toggle("checked", checked);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>const dueDt = state.dueTimes[i];</p>
+<p class="p1"><span class="Apple-converted-space">    </span>node.due.textContent = dueDt ? fmtAMPM(dueDt) : "--:--";</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>function renderAll(){</p>
+<p class="p1"><span class="Apple-converted-space">    </span>for (let i=0; i&lt;NUM_CUPS; i++) renderCup(i);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>function updateTimeProgress(){</p>
+<p class="p1"><span class="Apple-converted-space">    </span>if (!state.started || !state.sessionStart || !state.sessionEnd){</p>
+<p class="p1"><span class="Apple-converted-space">      </span>// bar empty, line at start</p>
+<p class="p1"><span class="Apple-converted-space">      </span>barFillEl.style.width = "0%";</p>
+<p class="p1"><span class="Apple-converted-space">      </span>nowLineEl.style.left = "0%";</p>
+<p class="p1"><span class="Apple-converted-space">      </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>const now = new Date();</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const total = msBetween(state.sessionStart, state.sessionEnd);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>let remaining = msBetween(now, state.sessionEnd);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>if (remaining &lt; 0) remaining = 0;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>const elapsed = total - remaining;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const frac = clamp(total &gt; 0 ? (elapsed / total) : 1, 0, 1);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>// countdown text</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const remSec = Math.floor(remaining / 1000);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const hrs = Math.floor(remSec / 3600);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const mins = Math.floor((remSec % 3600) / 60);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const secs = remSec % 60;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>setCountdown(`Time left: ${String(hrs).padStart(2,"0")}:${String(mins).padStart(2,"0")}:${String(secs).padStart(2,"0")}`);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>// bar</p>
+<p class="p1"><span class="Apple-converted-space">    </span>barFillEl.style.width = `${(frac * 100).toFixed(3)}%`;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>nowLineEl.style.left = `${(frac * 100).toFixed(3)}%`;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>// reached cups</p>
+<p class="p1"><span class="Apple-converted-space">    </span>for (let i=0; i&lt;NUM_CUPS; i++){</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const passed = frac &gt;= ((i+1) / NUM_CUPS);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (passed !== state.reached[i]){</p>
+<p class="p1"><span class="Apple-converted-space">        </span>state.reached[i] = passed;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>renderCup(i);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>// ----------------------------</p>
+<p class="p1"><span class="Apple-converted-space">  </span>// Wire up</p>
+<p class="p1"><span class="Apple-converted-space">  </span>// ----------------------------</p>
+<p class="p1"><span class="Apple-converted-space">  </span>buildCups();</p>
+<p class="p1"><span class="Apple-converted-space">  </span>load();</p>
+<p class="p1"><span class="Apple-converted-space">  </span>renderAll();</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>if (state.started &amp;&amp; state.sessionStart){</p>
+<p class="p1"><span class="Apple-converted-space">    </span>setStatus(`Started at ${fmtAMPM(state.sessionStart)}`);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>startNowBtn.addEventListener("click", startNow);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>setStartBtn.addEventListener("click", startFromEntry);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>resetBtn.addEventListener("click", resetAll);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>// tick loop</p>
+<p class="p1"><span class="Apple-converted-space">  </span>updateTimeProgress();</p>
+<p class="p1"><span class="Apple-converted-space">  </span>setInterval(updateTimeProgress, UPDATE_MS);</p>
+<p class="p1">})();</p>
+<p class="p1">&lt;/script&gt;</p>
+<p class="p1">&lt;/body&gt;</p>
+<p class="p1">&lt;/html&gt;</p>
+</body>
+</html>
