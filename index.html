@@ -1,0 +1,511 @@
+<!doctype html>
+<html lang="en">
+<head>
+ <meta charset="utf-8" />
+ <meta name="viewport" content="width=device-width,initial-scale=1" />
+ <title>Water Tracker</title>
+ <style>
+ :root{
+ --w: 920px;
+ --bar-w: 760px;
+ --blue: #3a7bd5;
+ --water: #6ad3fe;
+ --text: #111;
+ --muted: #4a4a4a;
+ --line: #111;
+ --bg: #fff;
+ --sep: #474747;
+ }
+ body{
+ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial;
+ background: var(--bg);
+ color: var(--text);
+ display: grid;
+ place-items: start center;
+ padding: 18px;
+ }
+ .app{
+ width: min(var(--w), 100%);
+ border-radius: 16px;
+ padding: 12px 10px 18px;
+ }
+ .bar-row{
+ display: grid;
+ grid-template-columns: 90px 1fr 90px;
+ align-items: center;
+ gap: 10px;
+ margin-top: 4px;
+ }
+ .time-label{
+ font-size: 14px;
+ color: var(--text);
+ text-align: center;
+ user-select: none;
+ }
+ .bar-wrap{
+ position: relative;
+ height: 22px;
+ width: min(var(--bar-w), 100%);
+ margin: 0 auto;
+ border: 2px solid var(--line);
+ border-radius: 8px;
+ overflow: hidden;
+ background: transparent;
+ }
+ .bar-fill{
+ position: absolute;
+ left: 0;
+ top: 0;
+ bottom: 0;
+ width: 0%;
+ background: var(--blue);
+ }
+ .now-line{
+ position: absolute;
+ top: -8px;
+ bottom: -8px;
+ width: 2px;
+ background: var(--line);
+ left: 0%;
+ transform: translateX(-1px);
+ }
+ .header-text{
+ text-align: center;
+ font-weight: 700;
+ margin: 6px 0 10px;
+ user-select: none;
+ }
+ .cups{
+ display: grid;
+ grid-template-columns: repeat(16, 1fr);
+ gap: 8px;
+ margin-top: 10px;
+ align-items: start;
+ }
+ .cup-col{
+ display: grid;
+ justify-items: center;
+ gap: 6px;
+ position: relative;
+ }
+ /* separators after every 3 cups */
+ .cup-col.sep::after{
+ content:"";
+ position:absolute;
+ right: -6px;
+ top: -6px;
+ bottom: 24px;
+ width: 2px;
+ background: var(--sep);
+ opacity: 0.9;
+ }
+ .cup{
+ width: 45px;
+ height: 70px;
+ position: relative;
+ cursor: pointer;
+ user-select: none;
+ }
+ /* Cup outline using SVG for consistent rim + bottom */
+ .cup svg{
+ width: 100%;
+ height: 100%;
+ display: block;
+ }
+ .water{
+ position: absolute;
+ left: 7px;
+ right: 7px;
+ bottom: 10px;
+ height: 0%;
+ background: var(--water);
+ border-bottom-left-radius: 18px 22px;
+ border-bottom-right-radius: 18px 22px;
+ border-top-left-radius: 14px 10px;
+ border-top-right-radius: 14px 10px;
+ filter: saturate(1.05);
+ opacity: 0;
+ transition: opacity 140ms ease;
+ pointer-events: none;
+ }
+ /* give the water a slight curved surface */
+ .water::before{
+ content:"";
+ position:absolute;
+ left: -2px;
+ right: -2px;
+ top: -6px;
+ height: 14px;
+ border-radius: 999px;
+ border: 1px solid rgba(0,0,0,0.45);
+ background: rgba(255,255,255,0.08);
+ }
+ .check{
+ position: absolute;
+ inset: 0;
+ display: grid;
+ place-items: center;
+ font-size: 34px;
+ font-weight: 800;
+ color: #17a34a;
+ opacity: 0;
+ transform: scale(0.96);
+ transition: opacity 120ms ease, transform 120ms ease;
+ pointer-events: none;
+ }
+ .cup.reached .water{
+ opacity: 1;
+ height: 85%;
+ }
+ /* if checked: show check, hide water */
+ .cup.checked .check{
+ opacity: 1;
+ transform: scale(1);
+ }
+ .cup.checked .water{
+ opacity: 0;
+ }
+ .due{
+ font-size: 11px;
+ color: #333;
+ user-select: none;
+ white-space: nowrap;
+ }
+ .caption{
+ margin-top: 10px;
+ text-align: center;
+ color: #444;
+ }
+ .controls{
+ display: flex;
+ gap: 10px;
+ justify-content: center;
+ align-items: center;
+ margin-top: 16px;
+ flex-wrap: wrap;
+ }
+ button{
+ border: none;
+ padding: 8px 14px;
+ border-radius: 999px;
+ background: #6ad3fe;
+ font-weight: 700;
+ cursor: pointer;
+ }
+ button:hover{ background: #bbe9fc; }
+ button:active{ background: #41b9ea; }
+ button:disabled{
+ opacity: 0.5;
+ cursor: not-allowed;
+ }
+ input{
+ width: 90px;
+ padding: 7px 10px;
+ border-radius: 10px;
+ border: 1px solid #bbb;
+ text-align: center;
+ font-size: 14px;
+ }
+ .status{
+ text-align:center;
+ margin-top: 8px;
+ color: #333;
+ font-size: 13px;
+ user-select: none;
+ }
+ @media (max-width: 980px){
+ .cups{ grid-template-columns: repeat(8, 1fr); row-gap: 14px; }
+ .cup-col.sep::after{ display:none; }
+ }
+ </style>
+</head>
+<body>
+ <div class="app">
+ <div class="header-text" id="countdown">Press Start</div>
+ <div class="bar-row">
+ <div class="time-label" id="startLabel">7:00 AM</div>
+ <div class="bar-wrap">
+ <div class="bar-fill" id="barFill"></div>
+ <div class="now-line" id="nowLine"></div>
+ </div>
+ <div class="time-label" id="endLabel">10:00 PM</div>
+ </div>
+ <div class="controls">
+ <button id="startNowBtn">Start (now)</button>
+ <input id="startInput" value="7:00am" />
+ <button id="setStartBtn">Set Start Time</button>
+ <button id="resetBtn" title="Clears saved session & checks">Reset</button>
+ </div>
+ <div class="status" id="status">Enter a start time or press Start.</div>
+ <div class="cups" id="cups"></div>
+ <div class="caption">Click cups to check off 8 oz each (click again to undo).</div>
+ </div>
+<script>
+(() => {
+ // ----------------------------
+ // Config (matches your Tkinter)
+ // ----------------------------
+ const START_TIME = { h: 7, m: 0 };  // 7:00 AM label default (actual session start is user-set)
+ const END_TIME  = { h: 22, m: 0 }; // 10:00 PM
+ const NUM_CUPS = 16;
+ const UPDATE_MS = 1000;
+ // separator after every N cups (visual)
+ const SEPS_ENABLED = true;
+ const SEPS_EVERY_N = 3;
+ // ----------------------------
+ // Helpers
+ // ----------------------------
+ const clamp = (x, lo=0, hi=1) => Math.max(lo, Math.min(hi, x));
+ function fmtAMPM(date){
+ // returns like "7:05 PM" without leading zero hour
+ let h = date.getHours();
+ const m = date.getMinutes();
+ const suffix = h < 12 ? "AM" : "PM";
+ let h12 = h % 12;
+ if (h12 === 0) h12 = 12;
+ return `${h12}:${String(m).padStart(2,"0")} ${suffix}`;
+ }
+ function fmtAMPMFromHM(h, m){
+ const d = new Date();
+ d.setHours(h, m, 0, 0);
+ return fmtAMPM(d);
+ }
+ function parseTimeString(s){
+ // Accepts: '7:05', '07:05', '7:05am', '7:05 pm', '19:05'
+ s = (s ?? "").trim().toLowerCase().replaceAll(" ", "");
+ if (!s) return null;
+ const am = s.endsWith("am");
+ const pm = s.endsWith("pm");
+ if (am || pm) s = s.slice(0, -2);
+ if (!s.includes(":")) return null;
+ const [hh, mm] = s.split(":", 2);
+ if (!/^\d+$/.test(hh) || !/^\d+$/.test(mm)) return null;
+ let h = Number(hh);
+ const m = Number(mm);
+ if (m < 0 || m > 59) return null;
+ if (am || pm){
+ if (h < 1 || h > 12) return null;
+ if (h === 12) h = 0;
+ if (pm) h += 12;
+ } else {
+ if (h < 0 || h > 23) return null;
+ }
+ return { h, m };
+ }
+ function todayAt(h, m){
+ const now = new Date();
+ const d = new Date(now);
+ d.setHours(h, m, 0, 0);
+ return d;
+ }
+ function addDays(date, n){
+ const d = new Date(date);
+ d.setDate(d.getDate() + n);
+ return d;
+ }
+ function msBetween(a, b){ return b.getTime() - a.getTime(); }
+ // ----------------------------
+ // State + persistence
+ // ----------------------------
+ const STORAGE_KEY = "water_tracker_v1";
+ const state = {
+ started: false,
+ sessionStart: null, // Date
+ sessionEnd: null,  // Date
+ dueTimes: Array(NUM_CUPS).fill(null), // Date[]
+ checked: Array(NUM_CUPS).fill(false),
+ reached: Array(NUM_CUPS).fill(false),
+ };
+ function save(){
+ const payload = {
+ started: state.started,
+ sessionStart: state.sessionStart ? state.sessionStart.toISOString() : null,
+ sessionEnd: state.sessionEnd ? state.sessionEnd.toISOString() : null,
+ dueTimes: state.dueTimes.map(d => d ? d.toISOString() : null),
+ checked: state.checked
+ };
+ localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+ }
+ function load(){
+ const raw = localStorage.getItem(STORAGE_KEY);
+ if (!raw) return;
+ try{
+ const p = JSON.parse(raw);
+ state.started = !!p.started;
+ state.sessionStart = p.sessionStart ? new Date(p.sessionStart) : null;
+ state.sessionEnd = p.sessionEnd ? new Date(p.sessionEnd) : null;
+ state.dueTimes = Array.isArray(p.dueTimes) ? p.dueTimes.map(x => x ? new Date(x) : null) : Array(NUM_CUPS).fill(null);
+ state.checked = Array.isArray(p.checked) ? p.checked.map(Boolean).slice(0, NUM_CUPS) : Array(NUM_CUPS).fill(false);
+ // reached will be recomputed on tick
+ } catch {}
+ }
+ function resetAll(){
+ localStorage.removeItem(STORAGE_KEY);
+ state.started = false;
+ state.sessionStart = null;
+ state.sessionEnd = null;
+ state.dueTimes = Array(NUM_CUPS).fill(null);
+ state.checked = Array(NUM_CUPS).fill(false);
+ state.reached = Array(NUM_CUPS).fill(false);
+ renderAll();
+ setStatus("Enter a start time or press Start.");
+ setCountdown("Press Start");
+ }
+ // ----------------------------
+ // UI build
+ // ----------------------------
+ const cupsEl = document.getElementById("cups");
+ const barFillEl = document.getElementById("barFill");
+ const nowLineEl = document.getElementById("nowLine");
+ const countdownEl = document.getElementById("countdown");
+ const statusEl = document.getElementById("status");
+ const startNowBtn = document.getElementById("startNowBtn");
+ const setStartBtn = document.getElementById("setStartBtn");
+ const resetBtn = document.getElementById("resetBtn");
+ const startInput = document.getElementById("startInput");
+ document.getElementById("startLabel").textContent = fmtAMPMFromHM(START_TIME.h, START_TIME.m);
+ document.getElementById("endLabel").textContent  = fmtAMPMFromHM(END_TIME.h, END_TIME.m);
+ // Cup SVG template (rim oval + sides + bottom arc)
+ function cupSVG(){
+ return `
+ <svg viewBox="0 0 45 70" aria-hidden="true">
+ <!-- rim oval -->
+ <ellipse cx="22.5" cy="9" rx="14" ry="6" fill="none" stroke="#111" stroke-width="2"/>
+ <!-- sides -->
+ <path d="M 10 10 C 8 28, 10 45, 14 58" fill="none" stroke="#111" stroke-width="2" stroke-linecap="round"/>
+ <path d="M 35 10 C 37 28, 35 45, 31 58" fill="none" stroke="#111" stroke-width="2" stroke-linecap="round"/>
+ <!-- bottom -->
+ <path d="M 14 58 C 18 66, 27 66, 31 58" fill="none" stroke="#111" stroke-width="2" stroke-linecap="round"/>
+ </svg>
+ `;
+ }
+ const cupNodes = [];
+ function buildCups(){
+ cupsEl.innerHTML = "";
+ cupNodes.length = 0;
+ for (let i=0; i<NUM_CUPS; i++){
+ const col = document.createElement("div");
+ col.className = "cup-col" + (SEPS_ENABLED && SEPS_EVERY_N>0 && (i % SEPS_EVERY_N === SEPS_EVERY_N-1) && i !== NUM_CUPS-1 ? " sep" : "");
+ const cup = document.createElement("div");
+ cup.className = "cup";
+ cup.innerHTML = `
+ <div class="water"></div>
+ <div class="check">✓</div>
+ ${cupSVG()}
+ `;
+ const due = document.createElement("div");
+ due.className = "due";
+ due.textContent = "--:--";
+ cup.addEventListener("click", () => {
+ state.checked[i] = !state.checked[i];
+ save();
+ renderCup(i);
+ });
+ col.appendChild(cup);
+ col.appendChild(due);
+ cupsEl.appendChild(col);
+ cupNodes.push({ cup, due });
+ }
+ }
+ function setStatus(text){ statusEl.textContent = text; }
+ function setCountdown(text){ countdownEl.textContent = text; }
+ // ----------------------------
+ // Session logic (matches your Python)
+ // ----------------------------
+ function applySessionStart(startDt){
+ let endDt = todayAt(END_TIME.h, END_TIME.m);
+ if (startDt >= endDt) endDt = addDays(endDt, 1);
+ state.sessionStart = startDt;
+ state.sessionEnd = endDt;
+ state.started = true;
+ const totalMs = msBetween(state.sessionStart, state.sessionEnd);
+ const step = totalMs / NUM_CUPS;
+ for (let i=0; i<NUM_CUPS; i++){
+ state.dueTimes[i] = new Date(state.sessionStart.getTime() + step * (i+1));
+ }
+ save();
+ setStatus(`Started at ${fmtAMPM(state.sessionStart)}`);
+ renderAll(); // updates due labels immediately
+ }
+ function startNow(){
+ applySessionStart(new Date());
+ }
+ function startFromEntry(){
+ const parsed = parseTimeString(startInput.value);
+ if (!parsed){
+ setStatus("Invalid time. Try 8:15am, 08:15, or 20:15.");
+ return;
+ }
+ const now = new Date();
+ let startDt = new Date(now);
+ startDt.setHours(parsed.h, parsed.m, 0, 0);
+ // If typed time is in the future (later today), assume they meant yesterday
+ if (startDt > now) startDt = addDays(startDt, -1);
+ applySessionStart(startDt);
+ }
+ // ----------------------------
+ // Rendering
+ // ----------------------------
+ function renderCup(i){
+ const node = cupNodes[i];
+ if (!node) return;
+ const reached = !!state.reached[i];
+ const checked = !!state.checked[i];
+ node.cup.classList.toggle("reached", reached);
+ node.cup.classList.toggle("checked", checked);
+ const dueDt = state.dueTimes[i];
+ node.due.textContent = dueDt ? fmtAMPM(dueDt) : "--:--";
+ }
+ function renderAll(){
+ for (let i=0; i<NUM_CUPS; i++) renderCup(i);
+ }
+ function updateTimeProgress(){
+ if (!state.started || !state.sessionStart || !state.sessionEnd){
+ // bar empty, line at start
+ barFillEl.style.width = "0%";
+ nowLineEl.style.left = "0%";
+ return;
+ }
+ const now = new Date();
+ const total = msBetween(state.sessionStart, state.sessionEnd);
+ let remaining = msBetween(now, state.sessionEnd);
+ if (remaining < 0) remaining = 0;
+ const elapsed = total - remaining;
+ const frac = clamp(total > 0 ? (elapsed / total) : 1, 0, 1);
+ // countdown text
+ const remSec = Math.floor(remaining / 1000);
+ const hrs = Math.floor(remSec / 3600);
+ const mins = Math.floor((remSec % 3600) / 60);
+ const secs = remSec % 60;
+ setCountdown(`Time left: ${String(hrs).padStart(2,"0")}:${String(mins).padStart(2,"0")}:${String(secs).padStart(2,"0")}`);
+ // bar
+ barFillEl.style.width = `${(frac * 100).toFixed(3)}%`;
+ nowLineEl.style.left = `${(frac * 100).toFixed(3)}%`;
+ // reached cups
+ for (let i=0; i<NUM_CUPS; i++){
+ const passed = frac >= ((i+1) / NUM_CUPS);
+ if (passed !== state.reached[i]){
+ state.reached[i] = passed;
+ renderCup(i);
+ }
+ }
+ }
+ // ----------------------------
+ // Wire up
+ // ----------------------------
+ buildCups();
+ load();
+ renderAll();
+ if (state.started && state.sessionStart){
+ setStatus(`Started at ${fmtAMPM(state.sessionStart)}`);
+ }
+ startNowBtn.addEventListener("click", startNow);
+ setStartBtn.addEventListener("click", startFromEntry);
+ resetBtn.addEventListener("click", resetAll);
+ // tick loop
+ updateTimeProgress();
+ setInterval(updateTimeProgress, UPDATE_MS);
+})();
+</script>
+</body>
+</html>
